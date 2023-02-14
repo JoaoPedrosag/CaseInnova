@@ -1,8 +1,8 @@
 import 'package:case_innova/src/core/controller/configuration_controller.dart';
 import 'package:case_innova/src/modules/home/controller/home_controller.dart';
-import 'package:case_innova/src/modules/home/model/todo_person.dart';
 import 'package:case_innova/src/modules/home/widgets/modal_detail.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -19,12 +19,10 @@ class _HomePageState extends State<HomePage> {
   late final ScrollController _scrollController;
   final controller = Modular.get<HomeController>();
   final controllerTheme = Modular.get<ConfigurationController>();
-  List<Results> list = [];
 
   @override
   void initState() {
     super.initState();
-    controller.getAllPerson();
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       infiniteScroll();
@@ -32,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   infiniteScroll() async {
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent &&
         controller.state != HomeState.loading) {
@@ -98,7 +97,9 @@ class _HomePageState extends State<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: TextFormField(
-                          onChanged: _search,
+                          onChanged: (value) {
+                            controller.search(value);
+                          },
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(10),
@@ -127,7 +128,9 @@ class _HomePageState extends State<HomePage> {
     return Expanded(
       child: ListView.builder(
         controller: _scrollController,
-        itemCount: list.isEmpty ? controller.list.length : list.length,
+        itemCount: controller.listSearch.isEmpty
+            ? controller.list.length
+            : controller.listSearch.length,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(8),
@@ -153,39 +156,43 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   child: Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.1),
-                            spreadRadius: 3,
-                            blurRadius: 1,
-                            offset: const Offset(
-                                0, 3), // changes position of shadow
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              list.isEmpty
-                                  ? controller.list[index].name!
-                                  : list[index].name!,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Icon(
-                              Icons.list,
-                              color: Theme.of(context).colorScheme.onBackground,
-                            )
-                          ],
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.1),
+                          spreadRadius: 3,
+                          blurRadius: 1,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
                         ),
-                      )),
+                      ],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            controller.listSearch.isEmpty
+                                ? controller.list[index].name!
+                                : controller.listSearch[index].name!,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Icons.list,
+                            color: Theme.of(context).colorScheme.onBackground,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -234,25 +241,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  _search(String search) {
-    if (search.length > 3) {
-      for (var value in controller.list) {
-        if (value.name!.toLowerCase().contains(search.toLowerCase())) {
-          list = value.name!.toLowerCase().contains(search.toLowerCase())
-              ? [value]
-              : [];
-          setState(() {
-            list;
-          });
-        }
-      }
-    } else {
-      list = [];
-      setState(() {
-        list;
-      });
-    }
   }
 }
