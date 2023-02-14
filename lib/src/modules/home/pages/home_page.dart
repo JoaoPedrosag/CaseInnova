@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
+import '../../../core/widgets/button/custom_button.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -62,7 +64,11 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text('Personagens do Star Wars',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onBackground,
+                fontWeight: FontWeight.bold,
+                fontSize: 20)),
         actions: [
           Observer(
             builder: (context) => IconButton(
@@ -77,27 +83,41 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Container(
-              child: TextFormField(
-                onChanged: _search,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  suffixIcon: Icon(Icons.search),
-                  hintText: 'Informe o nome do personagem',
-                  hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground),
-                ),
+        padding: const EdgeInsets.all(4.0),
+        child: Observer(
+          builder: (_) => Column(
+            children: [
+              controller.state == HomeState.loading
+                  ? Container()
+                  : Container(
+                      height: MediaQuery.of(context).size.height * 0.07,
+                      width: MediaQuery.of(context).size.width * 0.97,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: TextFormField(
+                          onChanged: _search,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.all(10),
+                            suffixIcon: const Icon(Icons.search),
+                            hintText: 'Informe o nome do personagem',
+                            hintStyle: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onBackground),
+                          ),
+                        ),
+                      ),
+                    ),
+              Observer(
+                builder: (_) {
+                  return stateManagement(controller.state);
+                },
               ),
-            ),
-            Observer(
-              builder: (_) {
-                return stateManagement(controller.state);
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -105,78 +125,73 @@ class _HomePageState extends State<HomePage> {
 
   _success() {
     return Expanded(
-      child: ListView.separated(
-          controller: _scrollController,
-          itemCount: list.isEmpty ? controller.list.length : list.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(8),
-              child: Center(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                  child: GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20))),
-                        isDismissible: true,
-                        isScrollControlled: true,
-                        builder: (context) => ModalDetail(
-                            name: controller.list[index].name!,
-                            birthYear: controller.list[index].birthYear!,
-                            gender: controller.list[index].gender!,
-                            eyesColor: controller.list[index].eyeColor!,
-                            films: controller.list[index].films!),
-                      );
-                    },
-                    child: Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondary
-                                  .withOpacity(0.1),
-                              spreadRadius: 3,
-                              blurRadius: 1,
-                              offset: const Offset(
-                                  0, 3), // changes position of shadow
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Observer(
-                                builder: (_) => Text(
-                                  list.isEmpty
-                                      ? controller.list[index].name!
-                                      : list[index].name!,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                              ),
-                              Icon(
-                                Icons.list,
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                              )
-                            ],
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: list.isEmpty ? controller.list.length : list.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8),
+            child: Center(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.1,
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      isDismissible: true,
+                      isScrollControlled: true,
+                      builder: (context) => ModalDetail(
+                          name: controller.list[index].name!,
+                          birthYear: controller.list[index].birthYear!,
+                          gender: controller.list[index].gender!,
+                          eyesColor: controller.list[index].eyeColor!,
+                          films: controller.list[index].films!),
+                    );
+                  },
+                  child: Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.1),
+                            spreadRadius: 3,
+                            blurRadius: 1,
+                            offset: const Offset(
+                                0, 3), // changes position of shadow
                           ),
-                        )),
-                  ),
+                        ],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              list.isEmpty
+                                  ? controller.list[index].name!
+                                  : list[index].name!,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Icon(
+                              Icons.list,
+                              color: Theme.of(context).colorScheme.onBackground,
+                            )
+                          ],
+                        ),
+                      )),
                 ),
               ),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) =>
-              const Divider()),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -190,11 +205,13 @@ class _HomePageState extends State<HomePage> {
         SizedBox(
           height: MediaQuery.of(context).size.height * .8,
           child: Center(
-            child: ElevatedButton(
-                child: const Text('Tentar novamente',
+            child: ButtonCustom(
+                color: Theme.of(context).colorScheme.primary,
+                label: Text('Tentar novamente',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize:
+                          Theme.of(context).textTheme.titleMedium!.fontSize,
                       fontWeight: FontWeight.bold,
                     )),
                 onPressed: () {
@@ -207,10 +224,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   _loading() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * .60,
-      child: const Center(
-        child: CircularProgressIndicator(),
+    return Padding(
+      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * .7),
+      child: Column(
+        children: [
+          CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
+        ],
       ),
     );
   }
@@ -222,17 +243,16 @@ class _HomePageState extends State<HomePage> {
           list = value.name!.toLowerCase().contains(search.toLowerCase())
               ? [value]
               : [];
-          print(list);
+          setState(() {
+            list;
+          });
         }
-
-        // if (value.name!.toLowerCase().contains(value as Pattern)) {
-        //   controller.personTodo.results!.add(value);
-        // }
       }
+    } else {
+      list = [];
+      setState(() {
+        list;
+      });
     }
-
-    // final search = controller.list.where((element) {
-    //   return element.name!.toLowerCase().contains(value.toLowerCase());
-    // }).toList();
   }
 }
