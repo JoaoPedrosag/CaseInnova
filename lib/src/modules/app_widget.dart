@@ -3,6 +3,7 @@ import 'package:case_innova/src/core/themes/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:asuka/asuka.dart';
 
 class AppWidget extends StatefulWidget {
   const AppWidget({super.key});
@@ -17,6 +18,7 @@ class _AppWidgetState extends State<AppWidget> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) => MaterialApp.router(
+        builder: Asuka.builder,
         routeInformationParser: Modular.routeInformationParser,
         routerDelegate: Modular.routerDelegate,
         debugShowCheckedModeBanner: false,

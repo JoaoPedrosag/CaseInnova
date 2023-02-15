@@ -1,4 +1,6 @@
 import 'package:case_innova/src/core/controller/configuration_controller.dart';
+import 'package:case_innova/src/core/controller/internet_controller.dart';
+import 'package:case_innova/src/core/widgets/snack_bar/snack_bar_custom.dart';
 import 'package:case_innova/src/modules/home/controller/home_controller.dart';
 import 'package:case_innova/src/modules/home/widgets/modal_detail.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +21,12 @@ class _HomePageState extends State<HomePage> {
   late final ScrollController _scrollController;
   final controller = Modular.get<HomeController>();
   final controllerTheme = Modular.get<ConfigurationController>();
+  final internetController = Modular.get<InternetController>();
 
   @override
   void initState() {
     super.initState();
+    internetController.checkInternet();
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       infiniteScroll();
@@ -67,7 +71,7 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onBackground,
                 fontWeight: FontWeight.bold,
-                fontSize: 20)),
+                fontSize: Theme.of(context).textTheme.titleLarge!.fontSize)),
         actions: [
           Observer(
             builder: (context) => IconButton(
@@ -84,40 +88,45 @@ class _HomePageState extends State<HomePage> {
       body: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Observer(
-          builder: (_) => Column(
-            children: [
-              controller.state == HomeState.loading
-                  ? Container()
-                  : Container(
-                      height: MediaQuery.of(context).size.height * 0.07,
-                      width: MediaQuery.of(context).size.width * 0.97,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: TextFormField(
-                          onChanged: (value) {
-                            controller.search(value);
-                          },
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.all(10),
-                            suffixIcon: const Icon(Icons.search),
-                            hintText: 'Informe o nome do personagem',
-                            hintStyle: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground),
+          builder: (_) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: Column(
+              children: [
+                controller.state == HomeState.loading
+                    ? Container()
+                    : Container(
+                        height: MediaQuery.of(context).size.height * 0.07,
+                        width: MediaQuery.of(context).size.width * 0.97,
+                        decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: TextFormField(
+                            onChanged: (value) {
+                              controller.search(value);
+                            },
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(10),
+                              suffixIcon: const Icon(Icons.search),
+                              hintText: 'Informe o nome do personagem',
+                              hintStyle: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-              Observer(
-                builder: (_) {
-                  return stateManagement(controller.state);
-                },
-              ),
-            ],
+                Observer(
+                  builder: (_) {
+                    return stateManagement(controller.state);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -209,21 +218,28 @@ class _HomePageState extends State<HomePage> {
   _error() {
     return Column(
       children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .8,
-          child: Center(
-            child: ButtonCustom(
-                color: Theme.of(context).colorScheme.primary,
-                label: Text('Tentar novamente',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondary,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium!.fontSize,
-                      fontWeight: FontWeight.bold,
-                    )),
-                onPressed: () {
-                  controller.getAllPerson();
-                }),
+        Center(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: Center(
+              child: ButtonCustom(
+                  color: Theme.of(context).colorScheme.primary,
+                  label: Text('Tentar novamente',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary,
+                        fontSize:
+                            Theme.of(context).textTheme.titleMedium!.fontSize,
+                        fontWeight: FontWeight.bold,
+                      )),
+                  onPressed: () {
+                    internetController.checkInternet();
+                    if (internetController.internet) {
+                      controller.getAllPerson();
+                    } else {
+                      SnackBarCustom.error('Parece que você sem internet');
+                    }
+                  }),
+            ),
           ),
         ),
       ],
