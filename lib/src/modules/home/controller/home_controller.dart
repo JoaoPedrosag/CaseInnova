@@ -32,6 +32,7 @@ abstract class _HomeController with Store {
       state = HomeState.loading;
       personTodo = await personImpl.getPerson(page);
       for (var i = 0; i < personTodo.results!.length; i++) {
+        personTodo.next == null ? page = 0 : page = page;
         list.add(personTodo.results![i]);
       }
       state = HomeState.success;

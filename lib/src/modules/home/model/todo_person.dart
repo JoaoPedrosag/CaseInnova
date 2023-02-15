@@ -1,11 +1,13 @@
 class TodoPerson {
+  String? next;
   String? previous;
   List<Results>? results;
 
-  TodoPerson({this.previous, this.results, required List persons});
+  TodoPerson({this.next, this.previous, this.results, required List persons});
 
   TodoPerson.fromJson(Map<String, dynamic> json) {
     previous = json['previous'];
+    next = json['next'];
     if (json['results'] != null) {
       results = <Results>[];
       json['results'].forEach((v) {
@@ -17,6 +19,7 @@ class TodoPerson {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['previous'] = previous;
+    data['next'] = next;
     if (results != null) {
       data['results'] = results!.map((v) => v.toJson()).toList();
     }

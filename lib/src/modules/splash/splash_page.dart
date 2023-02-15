@@ -15,6 +15,7 @@ class _SplashPageState extends State<SplashPage> {
   final controller = Modular.get<HomeController>();
   @override
   void initState() {
+    super.initState();
     controller.getAllPerson();
     Future.delayed(
       const Duration(seconds: 3),
@@ -22,7 +23,6 @@ class _SplashPageState extends State<SplashPage> {
         Modular.to.navigate('/home/');
       }),
     );
-    super.initState();
   }
 
   @override
