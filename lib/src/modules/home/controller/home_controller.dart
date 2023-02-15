@@ -42,6 +42,9 @@ abstract class _HomeController with Store {
   }
 
   @action
+  void changeLoading(value) => loading = value;
+
+  @action
   search(String search) {
     if (search.length >= 2) {
       for (var value in list) {
@@ -55,17 +58,12 @@ abstract class _HomeController with Store {
     }
   }
 
-  @action
-  void changeLoading(value) => loading = value;
-
   Future getFilm(List<String> films) async {
     try {
       changeLoading(true);
-
       for (var i = 0; i < films.length; i++) {
         listIds.add(await personImpl.getFilms(films[i]));
       }
-
       changeLoading(false);
     } catch (e) {
       changeLoading(false);

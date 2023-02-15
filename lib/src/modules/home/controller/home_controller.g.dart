@@ -60,22 +60,22 @@ mixin _$HomeController on _HomeController, Store {
       ActionController(name: '_HomeController', context: context);
 
   @override
-  dynamic search(String search) {
+  void changeLoading(dynamic value) {
     final _$actionInfo = _$_HomeControllerActionController.startAction(
-        name: '_HomeController.search');
+        name: '_HomeController.changeLoading');
     try {
-      return super.search(search);
+      return super.changeLoading(value);
     } finally {
       _$_HomeControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void changeLoading(dynamic value) {
+  dynamic search(String search) {
     final _$actionInfo = _$_HomeControllerActionController.startAction(
-        name: '_HomeController.changeLoading');
+        name: '_HomeController.search');
     try {
-      return super.changeLoading(value);
+      return super.search(search);
     } finally {
       _$_HomeControllerActionController.endAction(_$actionInfo);
     }

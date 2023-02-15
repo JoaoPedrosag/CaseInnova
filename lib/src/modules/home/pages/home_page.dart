@@ -87,10 +87,10 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: Observer(
-          builder: (_) => SizedBox(
-            height: MediaQuery.of(context).size.height * 0.9,
-            child: Column(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.9,
+          child: Observer(
+            builder: (_) => Column(
               children: [
                 controller.state == HomeState.loading
                     ? Container()
@@ -157,11 +157,21 @@ class _HomePageState extends State<HomePage> {
                       isDismissible: true,
                       isScrollControlled: true,
                       builder: (context) => ModalDetail(
-                          name: controller.list[index].name!,
-                          birthYear: controller.list[index].birthYear!,
-                          gender: controller.list[index].gender!,
-                          eyesColor: controller.list[index].eyeColor!,
-                          films: controller.list[index].films!),
+                          name: controller.listSearch.isEmpty
+                              ? controller.list[index].name!
+                              : controller.listSearch[index].name!,
+                          birthYear: controller.listSearch.isEmpty
+                              ? controller.list[index].birthYear!
+                              : controller.listSearch[index].birthYear!,
+                          gender: controller.listSearch.isEmpty
+                              ? controller.list[index].gender!
+                              : controller.listSearch[index].birthYear!,
+                          eyesColor: controller.listSearch.isEmpty
+                              ? controller.list[index].eyeColor!
+                              : controller.listSearch[index].eyeColor!,
+                          films: controller.listSearch.isEmpty
+                              ? controller.list[index].films!
+                              : controller.listSearch[index].films!),
                     );
                   },
                   child: Container(
@@ -182,23 +192,25 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            controller.listSearch.isEmpty
-                                ? controller.list[index].name!
-                                : controller.listSearch[index].name!,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Icon(
-                            Icons.list,
-                            color: Theme.of(context).colorScheme.onBackground,
-                          )
-                        ],
+                      child: Observer(
+                        builder: (_) => Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              controller.listSearch.isEmpty
+                                  ? controller.list[index].name!
+                                  : controller.listSearch[index].name!,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Icon(
+                              Icons.list,
+                              color: Theme.of(context).colorScheme.onBackground,
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
